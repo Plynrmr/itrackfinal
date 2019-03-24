@@ -3,6 +3,10 @@ session_start();
 if(!isset($_SESSION['userId'])){
     header('Location: index.php');
 }
+if(!isset($_GET['id'])){
+    header('Location: homeitrack.php');
+}
+$id = $_GET['id'];
     require "adminheader.php";
 ?>
 <?php
@@ -37,12 +41,12 @@ if(!isset($_SESSION['userId'])){
                         <th>Status</th>
                         <th>Investigator on Case</th>
                         <th>Remarks</th>
-                        <th> Date Completed </th>
                         <th> Edited By </th>
+                        <th> Date Completed </th>
                     </thead>
                     <tbody id="table-body">
                         <?php
-                        $sql = "SELECT* FROM adminview";
+                        $sql = "SELECT * FROM remarks left join users on remarks.userID = users.idUsers left join adminview on benNum = adminview_id where adminview_id = $id";
                         $select_case = mysqli_query($conn, $sql);
                         while($row = mysqli_fetch_assoc($select_case))
                         {
@@ -51,8 +55,9 @@ if(!isset($_SESSION['userId'])){
                             $dateComi = $row['dateComi'];
                             $compStatus = $row['compStatus'];
                             $compInv = $row['compInv'];
-                            $compRemarks = $row['compRemarks'];
+                            $compRemarks = $row['remark'];
                             $dateCompl= $row['dateCompl'];
+                            $name = $row['fnameUser']. ' ' . $row['lnameUser'];
                             #`benNum`, `compOffense`, `dateComi`, `compStatus`, `compInv`, `compRemarks`, `dateCompl`
                             //dapat for that specific case yung makikita hindi yung overall pero ganyan din yung laman//
                             echo"<tr>";
@@ -72,8 +77,8 @@ if(!isset($_SESSION['userId'])){
                             
                             echo "<td> $compInv </td>";
                             echo "<td> $compRemarks </td>";
+                            echo "<td>$name</td>";
                             echo "<td> $dateCompl </td>";
-                            echo "<td>zz</td>";
                             echo "</tr>";
                         }
                         ?>

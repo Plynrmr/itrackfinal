@@ -3,6 +3,13 @@ session_start();
 if(!isset($_SESSION['userId'])){
     header('Location: index.php');
 }
+if(!$_SESSION['isAdmin']){
+    header('Location: index.php');    
+}
+if($_SESSION['type'] == 'investigator'){
+    header("Location: dutyHome.php");          
+    exit();
+}
     require "adminheader.php";
 ?>
 <?php
@@ -16,10 +23,12 @@ if(!isset($_SESSION['userId'])){
     <title>iTrack</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 
 </head>
 <style>
-
+    
 </style>
 
 <body>
@@ -44,10 +53,9 @@ if(!isset($_SESSION['userId'])){
                          <option value="solved" name="status">Solved</option>
                     </select>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button  type="button" name="caseComplete" class="btn btn-primary" formation="/homeitrack.php">
-                            <a href= 'casecompleteArchive.php' style="color:white;text-decoration:none">Case Archives</a>
+                            <a class='btn btn-primary' href= 'casecompleteArchive.php' style="color:white;text-decoration:none">Case Archives</a>
                 <!-- go to case archives meaning "complete" -> casecompleteArchive.php -->
-                </button>
+                
                 </div>
             </div>  
         </div>
@@ -63,23 +71,34 @@ if(!isset($_SESSION['userId'])){
                         <th>Status</th>
                         <th>Investigator on Case</th>
                         <th>Remarks</th>
-                        <th> Date Completed </th>
                         <th> Edited By </th>
+                        <th> Date Completed </th>
                         <th> Action </th>
                     </thead>
-                    <tbody id="table-body">
+                    <tbody id="table_id" class="display">
                         <?php
-                        $sql = "SELECT* FROM adminview";
-                        $select_case = mysqli_query($conn, $sql);
-                        while($row = mysqli_fetch_assoc($select_case))
+                        $sql = "SELECT * FROM adminview left join 
+                            (
+                                SELECT  remark, remarks.adminview_id, CONCAT(fnameUser, ' ',lnameUser) as name
+                                from remarks right join
+                                (
+                                    SELECT max(created_at) as maxDate, adminview_id from remarks group by adminview_id
+                                )
+                                as remarks2 on remarks2.adminview_id = remarks.adminview_id
+                                join users on remarks.userID = users.idUsers where remarks2.maxDate = remarks.created_at
+                            )
+                         as remarks on adminview_id = benNum";
+                        $result = $conn->query($sql);
+                        while($row = $result->fetch_array())
                         {
                             $benNum = $row['benNum'];
                             $compOffense = $row['compOffense'];
                             $dateComi = $row['dateComi'];
                             $compStatus = $row['compStatus'];
                             $compInv = $row['compInv'];
-                            $compRemarks = $row['compRemarks'];
+                            $compRemarks = $row['remark'];
                             $dateCompl= $row['dateCompl'];
+                            $name = $row['name'];
                             #`benNum`, `compOffense`, `dateComi`, `compStatus`, `compInv`, `compRemarks`, `dateCompl`
 
                             echo"<tr>";
@@ -99,9 +118,9 @@ if(!isset($_SESSION['userId'])){
                             
                             echo "<td> $compInv </td>";
                             echo "<td> $compRemarks </td>";
+                            echo "<td>$name</td>";
                             echo "<td> $dateCompl </td>";
-                            echo "<td>zz</td>";
-                            echo "<td><a href='editRemarks.php?id=$benNum'>Edit Remarks</a> &nbsp;|&nbsp;<a href='caseDetails.php' class='text-success'>View Details</a></td>";
+                            echo "<td>&nbsp;<a href='caseDetails.php?id=$benNum' class='text-success'>View Details</a></td>";
                             echo "</tr>";
                         }
                         ?>
@@ -140,14 +159,25 @@ if(!isset($_SESSION['userId'])){
                 }
                 
                 tr.append('<td>'+v.compInv+'</td>');
-                tr.append('<td>'+v.compRemarks+'</td>');
+                if(v.remark == null){
+                    tr.append('<td></td>');
+                }else{
+                    tr.append('<td>'+v.remark+'</td>');
+                }
+                if(v.name == null){
+                    tr.append('<td></td>');
+                }else{
+                    tr.append('<td>'+v.name+'</td>');
+                }
                 if(v.dateCompl == null){
                     tr.append('<td></td>');
                 }else{
                     tr.append('<td>'+v.dateCompl+'</td>');
                 }
-                tr.append('<td><a href="editRemarks.php?id='+ v.benNum+'">Edit Remarks</a></td>');
-                $('#table-body').append(tr);
+                tr.append('<td><a href="caseDetails.php?id='+v.benNum+'" class="text-success">View Details</a></td>');
+                $('#table_id').append(tr);
+
+                //<a href='editRemarks.php?id=$benNum'>Edit Remarks</a> &nbsp;|&nbsp;<a href='caseDetails.php' class='text-success'>View Details</a>
             }
             let fetchData = function (event){
                 console.log("sfsdf");
@@ -163,7 +193,7 @@ if(!isset($_SESSION['userId'])){
                     },
                     success: function(response){
                         console.log(response);  
-                        $('#table-body').html('');
+                        $('#table_id').html('');
                         $.each(response, populateTable);
                     },
                 });
@@ -171,6 +201,9 @@ if(!isset($_SESSION['userId'])){
             $('#search').change(fetchData);
             $('#statusFilter').change(fetchData);;
         })
+        $(document).ready( function () {
+        $('#table_id').DataTable();
+        } );
     </script>
 </body>
 
