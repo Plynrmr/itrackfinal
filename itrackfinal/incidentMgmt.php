@@ -84,7 +84,7 @@
                             if($_SESSION['type'] == 'itms'){
                                 echo "<td><a class='btn btn-success btn-sm' href='itmsview_incidentmgmt.php?id=$id'>Edit Details</a></td>";
                             }else{
-                                echo "<td><a class='btn btn-success btn-sm' href='userview_incidentmgmt.php?id=$id'>Edit Details</a></td>";
+                                echo "<td><a class='btn btn-success btn-sm' href='userview_incidentMgmt.php?id=$id'>Edit Details</a></td>";
                             }
                             echo '</tr>';
                         }
@@ -121,7 +121,7 @@
                             <?php if($_SESSION['type'] == 'itms'){ ?>
                                 tr.append('<td><a class="btn btn-success btn-sm" href="itmsview_incidentmgmt.php?id='+ v.incidentTicket+'">Edit Details</a></td>');
                             <?php }else{ ?>
-                                tr.append('<td><a class="btn-success btn-sm" href="userview_incidentmgmt.php?id='+ v.incidentTicket+'">Edit Details</a></td>');
+                                tr.append('<td><a class="btn-success btn-sm" href="userview_incidentMgmt.php?id='+ v.incidentTicket+'">Edit Details</a></td>');
                             <?php } ?>
                             $('#table-body').append(tr);
                         });

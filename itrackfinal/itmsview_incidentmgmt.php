@@ -126,7 +126,7 @@
                            <!--si ITMS ang ang pwedeng gumalaw ng incident details, ang pwede lang galawin ng nagsubmit is yung re-open, cancel incident, cancel button-->
 
                            <button  type="cancel" id="cancelincident" class="btn btn-primary" formation="/homeitrack.php">
-                            <a href= "IncidentMgmt.php" style="color:white;text-decoration:none"> Cancel</a>
+                            <a href= "incidentMgmt.php" style="color:white;text-decoration:none"> Cancel</a>
                             </button>    
                         </div>
 

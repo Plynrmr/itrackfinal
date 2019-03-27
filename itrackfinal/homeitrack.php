@@ -126,10 +126,6 @@ if($_SESSION['type'] == 'investigator'){
                         ?>
                     </tbody>
                 </table>
-                <button  type="button" name="printReport" class="btn btn-primary" formation="/homeitrack.php">
-                            <a href= 'printreport.php' style="color:white;text-decoration:none">Generate Report</a>
-                <!-- nagerror kapag nililink namin sa "printreport.php"-->
-                </button>
                 <br>
                 <br>
             </div>

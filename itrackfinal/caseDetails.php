@@ -7,9 +7,11 @@ if(!isset($_GET['id'])){
     header('Location: homeitrack.php');
 }
 $id = $_GET['id'];
+if($_SESSION['isAdmin']){
     require "adminheader.php";
-?>
-<?php
+}else{
+    require "viewingheader.php";   
+}
    include_once 'includes/admin.inc.php';
 ?>
 <!DOCTYPE html>
